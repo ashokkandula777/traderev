@@ -19,6 +19,8 @@ import org.openqa.selenium.support.ui.Wait;
 
   @BeforeEach
   public void beforeEach() {
+      	System.setProperty("webdriver.chrome.driver","driver location in your local folder path");
+	WebDriver driver = new ChromeDriver();
     webDriver = new BrowserWebDriver().getWebDriver();
 	}
 	
@@ -37,6 +39,10 @@ import org.openqa.selenium.support.ui.Wait;
     canadianOpportunities.click();
     ArrayList<String> tabs2 = new ArrayList<>(webDriver.getWindowHandles());
     webDriver.switchTo().window(tabs2.get(1));
+    Assert.assertTrue(webDriver.getPageSource().contains("Reinventing automotive sales"));
+    Assert.assertTrue(webDriver.getPageSource().contains("YOU FOUND US. ")); 
+    Assert.assertTrue(webDriver.getPageSource().contains("START-UP ATTITUDE. BIG COMPANY FUEL."));
+    Assert.assertTrue(webDriver.getPageSource().contains("TRADEREV MAKING HEADLINES"));
   }
 
   @Test
