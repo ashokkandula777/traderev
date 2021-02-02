@@ -1,0 +1,83 @@
+package com.traderev.interviewtests;
+
+import java.util.ArrayList;
+import java.util.List;
+import org.junit.Assert;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.FluentWait;
+import org.openqa.selenium.support.ui.Wait;
+
+  @BeforeEach
+  public void beforeEach() {
+    webDriver = new BrowserWebDriver().getWebDriver();
+	}
+	
+	
+  @Test
+  @DisplayName("Launch website navigate to careers and validate if displayed properly")
+  public void scenario1() {
+    webDriver.get("https://www.traderev.com/en-ca/");
+    webDriver.findElement(By.linkText("Careers")).click();
+    ArrayList<String> tabs = new ArrayList<>(webDriver.getWindowHandles());
+    webDriver.switchTo().window(tabs.get(1));
+    Wait<WebDriver> wait = new FluentWait<>(webDriver).withTimeout(Duration.ofSeconds(120))
+        .pollingEvery(Duration.ofSeconds(5)).ignoring(NoSuchElementException.class);
+    WebElement canadianOpportunities = webDriver.findElement(By.linkText("Canadian Opportunities"));
+    wait.until(ExpectedConditions.elementToBeClickable(canadianOpportunities));
+    canadianOpportunities.click();
+    ArrayList<String> tabs2 = new ArrayList<>(webDriver.getWindowHandles());
+    webDriver.switchTo().window(tabs2.get(1));
+  }
+
+  @Test
+  @DisplayName("Launch careers page and add filter Toronto and validate it consists of only toronto jobs listed")
+  public void scenario2() {
+    webDriver.get("https://jobs.lever.co/traderev");
+    Wait<WebDriver> wait = new FluentWait<>(webDriver).withTimeout(Duration.ofSeconds(30))
+        .pollingEvery(Duration.ofSeconds(5)).ignoring(NoSuchElementException.class);
+    webDriver.findElement(By.xpath("//div[contains(text(),'Location')]")).click();
+    WebElement torontoLocation = webDriver.findElement(By.xpath("//a[contains(text(),'Toronto, Ontario, Canada')]"));
+    wait.until(ExpectedConditions.elementToBeClickable(torontoLocation));
+    torontoLocation.click();
+    String text = "Toronto, Ontario, Canada";
+    List<WebElement> list = webDriver.findElements(By.xpath("//*[contains(text(),'" + text + "')]"));
+    Assert.assertTrue("Toronto, Ontario, Canada", list.size() > 0);
+
+  }
+
+  @Test
+  @DisplayName("Launch careers, add location and team filter and print total number of jobs")
+  public void scenario3() {
+    webDriver.get("https://jobs.lever.co/traderev");
+    Wait<WebDriver> wait = new FluentWait<>(webDriver).withTimeout(Duration.ofSeconds(30))
+        .pollingEvery(Duration.ofSeconds(5)).ignoring(NoSuchElementException.class);
+    webDriver.findElement(By.xpath("//div[contains(text(),'Location')]")).click();
+    WebElement torontoLocation = webDriver.findElement(By.xpath("//a[contains(text(),'Toronto, Ontario, Canada')]"));
+    wait.until(ExpectedConditions.elementToBeClickable(torontoLocation));
+    torontoLocation.click();
+    webDriver.findElement(By.xpath("//div[contains(text(),'Team')]")).click();
+    WebElement engineering = webDriver.findElement(By.xpath("//a[contains(text(),'Engineering')]"));
+    wait.until(ExpectedConditions.elementToBeClickable(engineering));
+    engineering.click();
+    int count =0;
+    String text = "Toronto, Ontario, CanadaEngineering";
+    while(webDriver.getPageSource().contains(text)) {
+      count++;
+    }
+    System.out.println("Total number of jobs listed " + count);
+  }
+
+  @AfterEach
+  public void afterEach() {
+    webDriver.quit();
+  }
